@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const some = require("lodash/some");
 
-const FiatTokenV1 = artifacts.require("FiatTokenV1");
+const JunoCoinV1 = artifacts.require("JunoCoinV1");
 const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 
 const THROWAWAY_ADDRESS = "0x0000000000000000000000000000000000000001";
@@ -25,16 +25,16 @@ if (fs.existsSync(path.join(__dirname, "..", "config.js"))) {
 }
 
 module.exports = async (deployer, network) => {
-  if (some(["development", "coverage"], (v) => network.includes(v))) {
-    // DO NOT USE THESE ADDRESSES IN PRODUCTION - these are the deterministic
-    // addresses from ganache, so the private keys are well known and match the
-    // values we use in the tests
-    proxyAdminAddress = "0x2F560290FEF1B3Ada194b6aA9c40aa71f8e95598";
-    ownerAddress = "0xE11BA2b4D45Eaed5996Cd0823791E0C93114882d";
-    masterMinterAddress = "0x3E5e9111Ae8eB78Fe1CC3bb8915d5D461F3Ef9A9";
-    pauserAddress = "0xACa94ef8bD5ffEE41947b4585a84BdA5a3d3DA6E";
-    blacklisterAddress = "0xd03ea8624C8C5987235048901fB614fDcA89b117";
-  }
+  // if (some(["development", "coverage"], (v) => network.includes(v))) {
+  //   // DO NOT USE THESE ADDRESSES IN PRODUCTION - these are the deterministic
+  //   // addresses from ganache, so the private keys are well known and match the
+  //   // values we use in the tests
+  //   proxyAdminAddress = "0x2F560290FEF1B3Ada194b6aA9c40aa71f8e95598";
+  //   ownerAddress = "0xE11BA2b4D45Eaed5996Cd0823791E0C93114882d";
+  //   masterMinterAddress = "0x3E5e9111Ae8eB78Fe1CC3bb8915d5D461F3Ef9A9";
+  //   pauserAddress = "0xACa94ef8bD5ffEE41947b4585a84BdA5a3d3DA6E";
+  //   blacklisterAddress = "0xd03ea8624C8C5987235048901fB614fDcA89b117";
+  // }
 
   console.log(`Proxy Admin:   ${proxyAdminAddress}`);
   console.log(`Owner:         ${ownerAddress}`);
@@ -55,12 +55,12 @@ module.exports = async (deployer, network) => {
   }
 
   console.log("Deploying implementation contract...");
-  await deployer.deploy(FiatTokenV1);
-  const fiatTokenV1 = await FiatTokenV1.deployed();
-  console.log("Deployed implementation contract at", FiatTokenV1.address);
+  await deployer.deploy(JunoCoinV1);
+  const junoCoinV1 = await JunoCoinV1.deployed();
+  console.log("Deployed implementation contract at", JunoCoinV1.address);
 
   console.log("Initializing implementation contract with dummy values...");
-  await fiatTokenV1.initialize(
+  await junoCoinV1.initialize(
     "",
     "",
     "",
@@ -72,7 +72,7 @@ module.exports = async (deployer, network) => {
   );
 
   console.log("Deploying proxy contract...");
-  await deployer.deploy(FiatTokenProxy, FiatTokenV1.address);
+  await deployer.deploy(FiatTokenProxy, JunoCoinV1.address);
   const fiatTokenProxy = await FiatTokenProxy.deployed();
   console.log("Deployed proxy contract at", FiatTokenProxy.address);
 
@@ -84,11 +84,11 @@ module.exports = async (deployer, network) => {
   console.log("Initializing proxy contract...");
   // Pretend that the proxy address is a FiatTokenV1 - this is fine because the
   // proxy will forward all the calls to the FiatTokenV1 impl
-  const proxyAsV1 = await FiatTokenV1.at(FiatTokenProxy.address);
+  const proxyAsV1 = await JunoCoinV1.at(FiatTokenProxy.address);
   await proxyAsV1.initialize(
-    "USD//C",
-    "USDC",
-    "USD",
+    "Juno Coin",
+    "JUNO",
+    "JUNO",
     6,
     masterMinterAddress,
     pauserAddress,

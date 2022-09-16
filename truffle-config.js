@@ -8,7 +8,7 @@ const fs = require("fs");
 const path = require("path");
 
 // Read config file if it exists
-let config = { MNEMONIC: "", INFURA_KEY: "" };
+let config = { PRIV: "", INFURA_KEY: "" };
 if (fs.existsSync(path.join(__dirname, "config.js"))) {
   config = require("./config.js");
 }
@@ -44,6 +44,10 @@ module.exports = {
       provider: infuraProvider("ropsten"),
       network_id: 3,
     },
+    goerli: {
+      provider: infuraProvider("goerli"),
+      network_id: 5,       // goerli's id
+    },
   },
   mocha: {
     timeout: 60000, // prevents tests from failing when pc is under heavy load
@@ -54,8 +58,8 @@ module.exports = {
 
 function infuraProvider(network) {
   return () => {
-    if (!config.MNEMONIC) {
-      console.error("A valid MNEMONIC must be provided in config.js");
+    if (!config.PRIV) {
+      console.error("A valid PRIV must be provided in config.js");
       process.exit(1);
     }
     if (!config.INFURA_KEY) {
@@ -63,7 +67,7 @@ function infuraProvider(network) {
       process.exit(1);
     }
     return new HDWalletProvider(
-      config.MNEMONIC,
+      config.PRIV,
       `https://${network}.infura.io/v3/${config.INFURA_KEY}`
     );
   };

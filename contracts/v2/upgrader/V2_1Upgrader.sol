@@ -42,6 +42,7 @@ contract V2_1Upgrader is Ownable {
     FiatTokenV2_1 private _implementation;
     address private _newProxyAdmin;
     address private _lostAndFound;
+    address private _newOwner;
     V2UpgraderHelper private _helper;
 
     /**
@@ -55,13 +56,16 @@ contract V2_1Upgrader is Ownable {
         FiatTokenProxy proxy,
         FiatTokenV2_1 implementation,
         address newProxyAdmin,
-        address lostAndFound
+        address lostAndFound,
+        address newOwner
     ) public Ownable() {
         _proxy = proxy;
         _implementation = implementation;
         _newProxyAdmin = newProxyAdmin;
         _lostAndFound = lostAndFound;
+        _newOwner = newOwner;
         _helper = new V2UpgraderHelper(address(proxy));
+        setOwner(newOwner);
     }
 
     /**

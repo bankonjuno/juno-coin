@@ -2,13 +2,14 @@ const fs = require("fs");
 const path = require("path");
 const some = require("lodash/some");
 
-const FiatTokenV2_1 = artifacts.require("FiatTokenV2_1");
+const JunoCoinV1 = artifacts.require("JunoCoinV2");
 const FiatTokenProxy = artifacts.require("FiatTokenProxy");
-const V2_1Upgrader = artifacts.require("V2_1Upgrader");
+const V3Upgrader = artifacts.require("V3Upgrader");
 
 let proxyAdminAddress = "";
 let proxyContractAddress = "";
 let lostAndFoundAddress = "";
+let ownerContractAddress = ""
 
 // Read config file if it exists
 if (fs.existsSync(path.join(__dirname, "..", "config.js"))) {
@@ -16,16 +17,17 @@ if (fs.existsSync(path.join(__dirname, "..", "config.js"))) {
     PROXY_ADMIN_ADDRESS: proxyAdminAddress,
     PROXY_CONTRACT_ADDRESS: proxyContractAddress,
     LOST_AND_FOUND_ADDRESS: lostAndFoundAddress,
+    OWNER_ADDRESS: ownerContractAddress,
   } = require("../config.js"));
 }
 
 module.exports = async (deployer, network) => {
-  if (some(["development", "coverage"], (v) => network.includes(v))) {
-    // DO NOT USE THESE ADDRESSES IN PRODUCTION
-    proxyAdminAddress = "0x2F560290FEF1B3Ada194b6aA9c40aa71f8e95598";
-    proxyContractAddress = (await FiatTokenProxy.deployed()).address;
-    lostAndFoundAddress = "0x610Bb1573d1046FCb8A70Bbbd395754cD57C2b60";
-  }
+  // if (some(["development", "coverage"], (v) => network.includes(v))) {
+  //   // DO NOT USE THESE ADDRESSES IN PRODUCTION
+  //   proxyAdminAddress = "0x2F560290FEF1B3Ada194b6aA9c40aa71f8e95598";
+  //   proxyContractAddress = (await FiatTokenProxy.deployed()).address;
+  //   lostAndFoundAddress = "0x610Bb1573d1046FCb8A70Bbbd395754cD57C2b60";
+  // }
   proxyContractAddress =
     proxyContractAddress || (await FiatTokenProxy.deployed()).address;
 
@@ -33,12 +35,13 @@ module.exports = async (deployer, network) => {
     throw new Error("LOST_AND_FOUND_ADDRESS must be provided in config.js");
   }
 
-  const fiatTokenV2_1 = await FiatTokenV2_1.deployed();
+  const jcv1 = await JunoCoinV1.deployed();
 
   console.log(`Proxy Admin:     ${proxyAdminAddress}`);
   console.log(`FiatTokenProxy:  ${proxyContractAddress}`);
-  console.log(`FiatTokenV2_1:   ${fiatTokenV2_1.address}`);
+  console.log(`JunoCoinV1:   ${jcv1.address}`);
   console.log(`Lost & Found:    ${lostAndFoundAddress.address}`);
+  console.log(`owner:  ${ownerContractAddress}`);
 
   if (!proxyAdminAddress) {
     throw new Error("PROXY_ADMIN_ADDRESS must be provided in config.js");
@@ -46,15 +49,15 @@ module.exports = async (deployer, network) => {
 
   console.log("Deploying V2_1Upgrader contract...");
 
-  const v2_1Upgrader = await deployer.deploy(
-    V2_1Upgrader,
+  const v3Upgrader = await deployer.deploy(
+    V3Upgrader,
     proxyContractAddress,
-    fiatTokenV2_1.address,
+    jcv1.address,
     proxyAdminAddress,
-    lostAndFoundAddress
+    ownerContractAddress,
   );
 
   console.log(
-    `>>>>>>> Deployed V2_1Upgrader at ${v2_1Upgrader.address} <<<<<<<`
+    `>>>>>>> Deployed V3Upgrader at ${v3Upgrader.address} <<<<<<<`
   );
 };
