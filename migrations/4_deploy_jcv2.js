@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const some = require("lodash/some");
 
-const JunoCoinV1 = artifacts.require("JunoCoinV2");
+const JunoCoinV2 = artifacts.require("JunoCoinV2");
 const FiatTokenProxy = artifacts.require("FiatTokenProxy");
 
 let proxyContractAddress = "";
@@ -25,14 +25,14 @@ module.exports = async (deployer, network) => {
   console.log(`FiatTokenProxy: ${proxyContractAddress}`);
 
   console.log("Deploying JunoCoinV2 implementation contract...");
-  await deployer.deploy(JunoCoinV1);
+  await deployer.deploy(JunoCoinV2);
 
-  const jcv1 = await JunoCoinV1.deployed();
-  console.log("Deployed JunoCoinV2 at", jcv1.address);
+  const jcv2 = await JunoCoinV2.deployed();
+  console.log("Deployed JunoCoinV2 at", jcv2.address);
   console.log(
     "Initializing JunoCoinV2 implementation contract with dummy values..."
   );
-  await jcv1.initialize(
+  await jcv2.initialize(
     "",
     "",
     "",
@@ -42,7 +42,7 @@ module.exports = async (deployer, network) => {
     THROWAWAY_ADDRESS,
     THROWAWAY_ADDRESS
   );
-  await jcv1.initializeV2("");
-  await jcv1.initializeV2_1(THROWAWAY_ADDRESS);
-  await jcv1.initializeJCV2();
+  await jcv2.initializeV2("");
+  await jcv2.initializeV2_1(THROWAWAY_ADDRESS);
+  await jcv2.initializeJCV2();
 };

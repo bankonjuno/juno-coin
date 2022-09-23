@@ -29,8 +29,7 @@ import { FiatTokenV2_1 } from "../v2/FiatTokenV2_1.sol";
 // solhint-disable func-name-mixedcase
 
 /**
- * @title FiatToken V2.1
- * @notice ERC20 Token backed by fiat reserves, version 2.1
+ * @title JunoCoinV1
  */
 contract JunoCoinV1 is FiatTokenV2_1 {
 

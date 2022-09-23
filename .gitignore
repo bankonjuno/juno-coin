@@ -18,3 +18,5 @@ yarn-error.log
 @types/generated/
 config.js
 config.js.example
+FiatTokenProxy-input.json
+JunoCoinV1-input.json

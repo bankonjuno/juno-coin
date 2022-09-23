@@ -53,7 +53,7 @@ module.exports = {
     timeout: 60000, // prevents tests from failing when pc is under heavy load
     reporter: "Spec",
   },
-  plugins: ["solidity-coverage"],
+  plugins: ["solidity-coverage", "truffle-plugin-stdjsonin"],
 };
 
 function infuraProvider(network) {
